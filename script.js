@@ -1,12 +1,15 @@
 const dino = document.querySelector('.dino');
 const background = document.querySelector('.background');
-const FPS = 1000 / 55;
+const FPS = 1000 / 60;
+const cactusDisplacementSpeed = 10; // Velocidade em que os cactus se aproximam
+const jumpSpeed = 15; // Velocidade do pulo
+const leftBoundary = 90; // Deve corresponder ao indicado no arquivo .css (dino.style.left)
 
 let isJumping = false;
 let isGameOver = false;
 let position = 0;
 
-function handleKeyUp(event) {
+function handleKeyDown(event) {
 	if (event.keyCode === 32) {
 		if (!isJumping) {
 			jump();
@@ -27,13 +30,13 @@ function jump() {
 					clearInterval(downInterval);
 					isJumping = false;
 				} else {
-					position -= 20;
+					position -= jumpSpeed;
 					dino.style.bottom = position + 'px';
 				}
 			}, FPS);
 		} else {
 			// Subindo
-			position += 20;
+			position += jumpSpeed;
 			dino.style.bottom = position + 'px';
 		}
 	}, FPS);
@@ -41,8 +44,8 @@ function jump() {
 
 function createCactus() {
 	const cactus = document.createElement('div');
-	let cactusPosition = 1000;
-	let randomTime = Math.random() * (6000 - 100) + 100;
+	let cactusPosition = 1250;
+	let randomTime = Math.random() * (3000 - 1000) + 1000;
 
 	if (isGameOver) return;
 
@@ -55,13 +58,13 @@ function createCactus() {
 			// Saiu da tela
 			clearInterval(leftTimer);
 			background.removeChild(cactus);
-		} else if (cactusPosition > 0 && cactusPosition < 60 && position < 60) {
+		} else if (cactusPosition > leftBoundary && cactusPosition < leftBoundary + 60 && position < 60) {
 			// Game over
 			clearInterval(leftTimer);
 			isGameOver = true;
 			document.body.innerHTML = '<h1 class="game-over">Fim de jogo</h1>';
 		} else {
-			cactusPosition -= 10;
+			cactusPosition -= cactusDisplacementSpeed;
 			cactus.style.left = cactusPosition + 'px';
 		}
 	}, FPS);
@@ -70,4 +73,4 @@ function createCactus() {
 }
 
 createCactus();
-document.addEventListener('keyup', handleKeyUp);
+document.addEventListener('keydown', handleKeyDown);
